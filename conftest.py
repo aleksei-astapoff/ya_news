@@ -1,7 +1,9 @@
 import pytest
 
+from datetime import datetime, timedelta
+from django.utils import timezone 
 from news.models import Comment, News
-
+from yanews import settings
 
 @pytest.fixture
 def client(db, client):
@@ -47,3 +49,29 @@ def comment(news, author):
 @pytest.fixture
 def get_id_comment(comment):
     return comment.id,
+
+
+@pytest.fixture
+def news_list():
+    return News.objects.bulk_create(
+        News(
+            title=f'Новость {index}',
+            text='Просто текст.',
+            # Для каждой новости уменьшаем дату на index дней от today,
+            # где index - счётчик цикла.
+            date=datetime.today() - timedelta(days=index)
+        )
+        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1))
+
+
+@pytest.fixture
+def comments_list(news, author):
+    now = timezone.now()
+    for index in range(2):
+        comment = Comment.objects.create(
+            news=news,
+            author=author,
+            text=f'Текст {index}',
+        )
+    comment.created = now + timedelta(days=index)
+    comment.save()
