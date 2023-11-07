@@ -16,6 +16,7 @@ from pytest_django.asserts import assertRedirects
      )
 )
 def test_home_availability_for_anonymous_user(client, name, args):
+    "Доступные адреса для анонимных пользователей"
     url = reverse(name, args=args)
     response = client.get(url)
     assert response.status_code == HTTPStatus.OK
@@ -35,7 +36,9 @@ def test_home_availability_for_anonymous_user(client, name, args):
         ('news:delete', pytest.lazy_fixture('get_id_comment')),
     )
 )
-def test_author_can_edit_delete(author_client, name, args, parametrized_client, status_code):
+def test_author_can_edit_delete(author_client, name,
+                                args, parametrized_client, status_code):
+    "Аутентифицированному пользователю доступны страницы добавления и удаления" 
     url = reverse(name, args=args)
     response = parametrized_client.get(url)
     assert response.status_code == status_code
@@ -49,6 +52,7 @@ def test_author_can_edit_delete(author_client, name, args, parametrized_client, 
     )
 )
 def test_redirects(client, name, args):
+    "Тестирование редиректов"
     login_url = reverse('users:login')
     url = reverse(name, args=args)
     excepted_url = f'{login_url}?next={url}'
